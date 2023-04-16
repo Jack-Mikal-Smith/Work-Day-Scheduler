@@ -1,6 +1,7 @@
 // Wrap all code that interacts with the DOM in a call to jQuery to ensure that
 // the code isn't run until the browser has finished rendering all the elements
 // in the html.
+var rootElmnt = $('#root');
 
 // Grabbing the schedule container DOM and declaring it as a variable
 var scheduleElmnt = $('.container-fluid');
@@ -15,8 +16,12 @@ $(function () {
   // time-block containing the button that was clicked? How might the id be
   // useful when saving the description in local storage?
   
-scheduleElmnt.on('clicks', 'button', function() {
-    var savedBlock = $('.row time-block');
+scheduleElmnt.on('click', 'button', function() {
+    var savedBlock = $(this).parent().attr('id').split('-')[1];
+    console.log(savedBlock);
+    var task = $(this).siblings('.description').val();
+    window.localStorage.setItem(savedBlock, task);
+    console.log(task);
 } )
 
 
@@ -26,18 +31,31 @@ scheduleElmnt.on('clicks', 'button', function() {
   // past, present, and future classes? How can Day.js be used to get the
   // current hour in 24-hour time?
   
-
+  $('.time-block').each(function(){
+    var currentHour = dayjs().hour();
+    var blockHour = parseInt($(this).attr('id').split('-')[1]);
+    if (currentHour < blockHour) {
+      $(this).addClass('future')
+    } else if (currentHour === blockHour) {
+      $(this).addClass('present');
+    } else {
+      $(this).addClass('past');
+    }
+  })
 
 
   // TODO: Add code to get any user input that was saved in localStorage and set
   // the values of the corresponding textarea elements. HINT: How can the id
   // attribute of each time-block be used to do this?
   
+  for (i=9; i<18; i++) {
+    $('#hour-' + i + ' .description').val(localStorage.getItem(i));
+  }
 
 
 
   // TODO: Add code to display the current date in the header of the page.
 
-
-
+  $('#currentDay').text(dayjs().format('MMM DD, YYYY'))
+  
 });
